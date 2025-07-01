@@ -6,7 +6,7 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
 
 1. **Clone repo & masuk folder**
    ```bash
-   git clone [<repository-url>](https://github.com/2black0/Sinta-Scraping)
+   git clone https://github.com/2black0/sinta-scraping
    cd Sinta-Scraping
    ```
 
