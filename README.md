@@ -24,7 +24,7 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
      ```
 
 4. **Edit daftar dosen**
-   - Edit file `config/dosen.yaml` untuk menambah/mengganti dosen yang ingin di-scrape:
+   - Edit file `config/dosen.yaml` untuk menambah/mengganti dosen dengan data nama dan sinta id yang ingin di-scrape:
      ```yaml
      lecturers:
        - name: "Nama Dosen 1"
