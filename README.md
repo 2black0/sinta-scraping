@@ -11,9 +11,9 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
    ```
    
 2. **Isi file .env**
-   - Setelah setup, edit file `.env.example` menjadi `.env` di folder utama:
+   - Edit file `.env.example` menjadi `.env` di folder utama:
      ```env
-     SINTA_USERNAME=isi_username_sinta_anda
+     SINTA_USERNAME=isi_email_sinta_anda
      SINTA_PASSWORD=isi_password_sinta_anda
      ```
 
@@ -31,7 +31,7 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
    ```bash
    ./run.sh
    ```
-   > Script Windows (`run.bat`) tersedia, namun belum diuji.
+   > Script Windows (`run.bat`) tersedia, namun belum diuji, oleh karena itu pengguna windows disarankan langsung ke langkah no 5.
 
 5. **Jalankan scraping**
    - Secara default, `./run.sh` sudah otomatis menjalankan `main.py` dan menyimpan hasil scraping.
@@ -61,7 +61,7 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
 ## ℹ️ Catatan
 - **Wajib**: Gunakan conda environment (bukan Python system/brew).
 - **Script tested:** macOS/Linux (`run.sh`).
-- **Windows:** Script `run.bat` tersedia, tapi belum diuji penuh.
+- **Windows:** Script `run.bat` tersedia, tapi belum diuji penuh, disarankan langsung menjalankan `python main.py`.
 - **Kredensial SINTA** hanya disimpan di `.env` (tidak dibagikan).
 - **Daftar dosen** hanya dari `config/dosen.yaml`.
 
