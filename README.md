@@ -1,2 +1,75 @@
-# sinta-scraping
+# SINTA Scraping
 
+Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) untuk dosen, dengan setup otomatis.
+
+## 🚦 Cara Pakai Singkat
+
+1. **Clone repo & masuk folder**
+   ```bash
+   git clone [<repository-url>](https://github.com/2black0/Sinta-Scraping)
+   cd Sinta-Scraping
+   ```
+
+2. **Jalankan setup otomatis (macOS/Linux, sudah teruji)**
+   ```bash
+   ./run.sh
+   ```
+   > Script Windows (`run.bat`) tersedia, namun belum diuji.
+
+3. **Isi file .env**
+   - Setelah setup, edit file `.env.example` menjadi `.env` di folder utama:
+     ```env
+     SINTA_USERNAME=isi_username_sinta_anda
+     SINTA_PASSWORD=isi_password_sinta_anda
+     ```
+
+4. **Edit daftar dosen**
+   - Edit file `config/dosen.yaml` untuk menambah/mengganti dosen yang ingin di-scrape:
+     ```yaml
+     lecturers:
+       - name: "Nama Dosen 1"
+         id: 1234567
+       - name: "Nama Dosen 2"
+         id: 7654321
+     ```
+
+5. **Jalankan scraping**
+   - Secara default, `./run.sh` sudah otomatis menjalankan `main.py` dan menyimpan hasil scraping.
+   - Jika ingin menjalankan manual (misal setelah edit dosen atau .env):
+     ```bash
+     python main.py                     # Semua kategori
+     # atau pilih kategori tertentu:
+     python main.py --buku              # Hanya data buku
+     python main.py --haki              # Hanya data HAKI
+     python main.py --publikasi         # Semua publikasi (Scopus, GS, WoS)
+     python main.py --publikasi-scopus  # Hanya publikasi Scopus
+     python main.py --publikasi-gs      # Hanya publikasi Google Scholar
+     python main.py --publikasi-wos     # Hanya publikasi Web of Science
+     python main.py --penelitian        # Hanya data penelitian
+     python main.py --ppm               # Hanya data pengabdian masyarakat
+     python main.py --profil            # Hanya data profil dosen
+     # Opsi tambahan:
+     python main.py --force-login       # Paksa login ulang (abaikan session lama)
+     python main.py --config <file.yaml> # Gunakan file dosen custom
+     # Kombinasi beberapa kategori juga bisa:
+     python main.py --buku --publikasi --profil
+     ```
+
+## 📁 Output
+- Hasil scraping otomatis tersimpan di folder `output-<tanggal>/` dalam format CSV.
+
+## ℹ️ Catatan
+- **Wajib**: Gunakan conda environment (bukan Python system/brew).
+- **Script tested:** macOS/Linux (`run.sh`).
+- **Windows:** Script `run.bat` tersedia, tapi belum diuji penuh.
+- **Kredensial SINTA** hanya disimpan di `.env` (tidak dibagikan).
+- **Daftar dosen** hanya dari `config/dosen.yaml`.
+
+## ❓ Bantuan
+- Jika error, cek isi `.env` dan `config/dosen.yaml`.
+- Pastikan sudah menjalankan `./run.sh` sebelum scraping.
+- Untuk login ulang paksa: `python main.py --force-login`
+
+---
+
+**Happy Scraping! 🚀**

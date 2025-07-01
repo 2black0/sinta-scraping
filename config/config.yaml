@@ -1,0 +1,52 @@
+# SINTA Scraping Configuration
+# Konfigurasi untuk aplikasi SINTA Scraping
+
+# WebDriver Configuration
+webdriver:
+  # Path ke ChromeDriver executable
+  chrome_driver_path: "config/chromedriver"
+
+  # WebDriver Options
+  headless: true # Jalankan browser dalam mode headless
+  timeout: 30 # Timeout untuk operasi dalam detik
+  page_load_timeout: 60 # Timeout untuk loading halaman
+  implicit_wait: 10 # Implicit wait untuk element
+
+# Session Configuration
+session:
+  test_url: "https://sinta.kemdikbud.go.id/authors"
+  login_url: "https://sinta.kemdikbud.go.id/logins"
+  session_file: "config/session_data.json"
+
+# Scraping Configuration
+scraping:
+  # Delay antara request (dalam detik)
+  request_delay: 1
+
+  # Maximum retry untuk request yang gagal
+  max_retries: 3
+
+  # User Agent untuk request
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
+
+# Output Configuration
+output:
+  # Format direktori output (DDMMYYYY, YYYY-MM-DD, dll)
+  directory_format: "output-{date}"
+  date_format: "%d%m%Y" # Format tanggal untuk direktori
+
+  # File encoding
+  csv_encoding: "utf-8"
+
+# Lecturer Configuration
+lecturers:
+  # File konfigurasi dosen (bisa dioverride dengan --config)
+  config_file: "config/dosen.yaml"
+
+# Logging Configuration
+logging:
+  # Level logging (DEBUG, INFO, WARNING, ERROR)
+  level: "INFO"
+
+  # Show progress emoji
+  show_emoji: true
