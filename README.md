@@ -9,21 +9,15 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
    git clone https://github.com/2black0/sinta-scraping
    cd sinta-scraping
    ```
-
-2. **Jalankan setup otomatis (macOS/Linux, sudah teruji)**
-   ```bash
-   ./run.sh
-   ```
-   > Script Windows (`run.bat`) tersedia, namun belum diuji.
-
-3. **Isi file .env**
+   
+2. **Isi file .env**
    - Setelah setup, edit file `.env.example` menjadi `.env` di folder utama:
      ```env
      SINTA_USERNAME=isi_username_sinta_anda
      SINTA_PASSWORD=isi_password_sinta_anda
      ```
 
-4. **Edit daftar dosen**
+3. **Edit daftar dosen**
    - Edit file `config/dosen.yaml` untuk menambah/mengganti dosen dengan data nama dan sinta id (misal: https://sinta.kemdikbud.go.id/authors/profile/6726725) yang ingin di-scrape:
      ```yaml
      lecturers:
@@ -32,6 +26,12 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
        - name: "Nama Dosen 2"
          id: 7654321
      ```
+
+4. **Jalankan setup otomatis (macOS/Linux, sudah teruji)**
+   ```bash
+   ./run.sh
+   ```
+   > Script Windows (`run.bat`) tersedia, namun belum diuji.
 
 5. **Jalankan scraping**
    - Secara default, `./run.sh` sudah otomatis menjalankan `main.py` dan menyimpan hasil scraping.
