@@ -180,14 +180,20 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# ===== SINTA SCRAPING PROJECT SPECIFIC =====
+
+# Environment variables (contains sensitive credentials)
 .env
+
+# Hidden config folder (contains session data and credentials)
+.config/
 session_data.json
 chromedriver
 
-# Output directories with date
-output-*
-output_*
-output
+# Output directories with date patterns
+output-*/
+output_*/
+output/
 
 # Python cache
 __pycache__/
@@ -202,3 +208,25 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Conda environment files
+environment.yml
+environment.yaml
+
+# Log files
+*.log
+logs/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+*~
+
+# CSV output files (if needed to be ignored)
+# *.csv
+
+# Test files
+test_*.py
+*_test.py
+tests/
