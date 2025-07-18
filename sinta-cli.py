@@ -7,16 +7,16 @@ Versi CLI yang menggunakan request untuk login tanpa Selenium.
 Mendukung scraping berbagai kategori data: buku, HAKI, publikasi, penelitian, PPM, dan profil.
 
 Usage:
-    python main-cli.py                      # Scrape semua kategori untuk semua dosen
-    python main-cli.py --buku               # Scrape hanya data buku
-    python main-cli.py --haki               # Scrape hanya data HAKI
-    python main-cli.py --publikasi          # Scrape semua jenis publikasi (Scopus, Google Scholar, WoS)
-    python main-cli.py --publikasi-scopus   # Scrape hanya publikasi Scopus
-    python main-cli.py --publikasi-gs       # Scrape hanya publikasi Google Scholar
-    python main-cli.py --publikasi-wos      # Scrape hanya publikasi Web of Science
-    python main-cli.py --penelitian         # Scrape hanya data penelitian
-    python main-cli.py --ppm                # Scrape hanya data pengabdian masyarakat
-    python main-cli.py --profil             # Scrape hanya data profil dosen
+    python sinta-cli.py                      # Scrape semua kategori untuk semua dosen
+    python sinta-cli.py --buku               # Scrape hanya data buku
+    python sinta-cli.py --haki               # Scrape hanya data HAKI
+    python sinta-cli.py --publikasi          # Scrape semua jenis publikasi (Scopus, Google Scholar, WoS)
+    python sinta-cli.py --publikasi-scopus   # Scrape hanya publikasi Scopus
+    python sinta-cli.py --publikasi-gs       # Scrape hanya publikasi Google Scholar
+    python sinta-cli.py --publikasi-wos      # Scrape hanya publikasi Web of Science
+    python sinta-cli.py --penelitian         # Scrape hanya data penelitian
+    python sinta-cli.py --ppm                # Scrape hanya data pengabdian masyarakat
+    python sinta-cli.py --profil             # Scrape hanya data profil dosen
 
 Author: Refactored from main.py
 Date: July 2025
@@ -39,43 +39,15 @@ from dotenv import load_dotenv
 
 
 class ConfigManager:
-    """Manage application configuration from YAML file"""
+    """Manage application configuration with default values"""
     
-    def __init__(self, config_file="config.yaml"):
-        self.config_file = config_file
+    def __init__(self):
         self.config = {}
         self.load_config()
     
     def load_config(self):
-        """Load configuration from YAML file"""
-        try:
-            # Try to load from config directory first, then root
-            config_paths = [
-                os.path.join("config", self.config_file),
-                self.config_file
-            ]
-            
-            config_loaded = False
-            for config_path in config_paths:
-                if os.path.exists(config_path):
-                    try:
-                        import yaml
-                        with open(config_path, 'r', encoding='utf-8') as file:
-                            self.config = yaml.safe_load(file)
-                        print(f"✅ Loaded configuration from {config_path}")
-                        config_loaded = True
-                        break
-                    except ImportError:
-                        print(f"⚠️ PyYAML not installed, using default configuration")
-                        break
-            
-            if not config_loaded:
-                print(f"⚠️ Config file {self.config_file} not found, using defaults")
-                self._load_default_config()
-                
-        except Exception as e:
-            print(f"⚠️ Error loading config: {e}, using defaults")
-            self._load_default_config()
+        """Load default configuration"""
+        self._load_default_config()
     
     def _load_default_config(self):
         """Load default configuration"""
@@ -1345,16 +1317,16 @@ def create_argument_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python main-cli.py                     # Scrape semua kategori
-  python main-cli.py --buku              # Scrape hanya data buku
-  python main-cli.py --haki              # Scrape hanya data HAKI
-  python main-cli.py --publikasi         # Scrape semua publikasi
-  python main-cli.py --publikasi-scopus  # Scrape hanya Scopus
-  python main-cli.py --publikasi-gs      # Scrape hanya Google Scholar
-  python main-cli.py --publikasi-wos     # Scrape hanya Web of Science
-  python main-cli.py --penelitian        # Scrape hanya penelitian
-  python main-cli.py --ppm               # Scrape hanya PPM
-  python main-cli.py --profil            # Scrape hanya profil
+  python sinta-cli.py                     # Scrape semua kategori
+  python sinta-cli.py --buku              # Scrape hanya data buku
+  python sinta-cli.py --haki              # Scrape hanya data HAKI
+  python sinta-cli.py --publikasi         # Scrape semua publikasi
+  python sinta-cli.py --publikasi-scopus  # Scrape hanya Scopus
+  python sinta-cli.py --publikasi-gs      # Scrape hanya Google Scholar
+  python sinta-cli.py --publikasi-wos     # Scrape hanya Web of Science
+  python sinta-cli.py --penelitian        # Scrape hanya penelitian
+  python sinta-cli.py --ppm               # Scrape hanya PPM
+  python sinta-cli.py --profil            # Scrape hanya profil
         """
     )
     

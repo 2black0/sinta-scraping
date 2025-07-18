@@ -7,7 +7,7 @@ Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) un
 ### 1. **Setup Environment**
 ```bash
 # Install dependencies
-pip install requests>=2.32.3 beautifulsoup4>=4.12.3 python-dotenv>=1.0.0
+pip install requests>=2.32.3 beautifulsoup4>=4.12.3 python-dotenv>=1.0.0 charset-normalizer>=3.0.0
 ```
 
 ### 2. **Konfigurasi Login**
@@ -30,22 +30,22 @@ Edit file `dosen.txt` - satu ID SINTA per baris:
 ### 4. **Jalankan Scraping**
 ```bash
 # Scrape semua kategori
-python main-cli.py
+python sinta-cli.py
 
 # Scrape kategori tertentu
-python main-cli.py --buku              # Data buku
-python main-cli.py --haki              # Data HAKI
-python main-cli.py --publikasi         # Semua publikasi
-python main-cli.py --publikasi-scopus  # Publikasi Scopus
-python main-cli.py --publikasi-gs      # Publikasi Google Scholar
-python main-cli.py --publikasi-wos     # Publikasi Web of Science
-python main-cli.py --penelitian        # Data penelitian
-python main-cli.py --ppm               # Pengabdian masyarakat
-python main-cli.py --profil            # Profil dosen
+python sinta-cli.py --buku              # Data buku
+python sinta-cli.py --haki              # Data HAKI
+python sinta-cli.py --publikasi         # Semua publikasi
+python sinta-cli.py --publikasi-scopus  # Publikasi Scopus
+python sinta-cli.py --publikasi-gs      # Publikasi Google Scholar
+python sinta-cli.py --publikasi-wos     # Publikasi Web of Science
+python sinta-cli.py --penelitian        # Data penelitian
+python sinta-cli.py --ppm               # Pengabdian masyarakat
+python sinta-cli.py --profil            # Profil dosen
 
 # Opsi tambahan
-python main-cli.py --force-login       # Paksa login ulang
-python main-cli.py --config custom.txt # File dosen custom
+python sinta-cli.py --force-login       # Paksa login ulang
+python sinta-cli.py --config custom.txt # File dosen custom
 ```
 
 ## 📁 Output
@@ -87,7 +87,7 @@ output-18072025/
 - **Login gagal**: Periksa kredensial di `.env`
 - **Session expired**: Gunakan `--force-login`
 - **ID tidak ditemukan**: Periksa format di `dosen.txt`
-- **Error dependency**: Install ulang packages: `pip install requests>=2.32.3 beautifulsoup4>=4.12.3 python-dotenv>=1.0.0`
+- **Error dependency**: Install ulang packages: `pip install requests>=2.32.3 beautifulsoup4>=4.12.3 python-dotenv>=1.0.0 charset-normalizer>=3.0.0`
 - **Folder .config tidak ada**: Akan dibuat otomatis saat login pertama
 
 ## � Format Data Output
