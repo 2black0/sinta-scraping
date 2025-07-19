@@ -64,14 +64,13 @@ output-19072025/
 
 ---
 
-## ️ Troubleshooting
+## � Lisensi
 
-| Problem | Solution |
-|---------|----------|
-| Login gagal | Periksa kredensial di `.env` |
-| Session expired | Gunakan `--force-login` |
-| ID tidak ditemukan | Periksa format ID di `dosen.txt` |
-| Missing dependencies | `pip install requests beautifulsoup4 python-dotenv` |
+Proyek ini menggunakan MIT License - lihat file [LICENSE](LICENSE) untuk detail.
+
+---
+
+**Disclaimer**: Aplikasi ini untuk tujuan penelitian dan edukasi. Patuhi terms of service SINTA.
 
 ---
 
