@@ -1,23 +1,59 @@
-# SINTA Scraping CLI
+# SINTA Scraping
 
-Aplikasi scraping data SINTA (buku, HAKI, publikasi, penelitian, PPM, profil) untuk dosen. Versi CLI yang menggunakan login berbasis request dengan session management otomatis.
+Aplikasi untuk scraping data SINTA (Science and Technology Index) mencakup data buku, HAKI, publikasi, penelitian, PPM, dan profil dosen. Project ini memiliki 2 fitur utama:
 
-## 🚀 Cara Pakai
+## 🌟 Fitur Utama
 
-### 1. **Setup Environment**
+### 1. 🌐 **Web Interface** 
+Interface web modern dan user-friendly untuk operasional sehari-hari:
+- Tampilan sederhana dengan kontrol panel untuk konfigurasi
+- CSV viewer untuk melihat hasil scraping
+- Grid layout untuk seleksi kategori data
+- Dropdown download untuk file hasil
+- Real-time progress monitoring
+
+### 2. ⌨️ **CLI (Command Line Interface)**
+Interface command line yang powerful untuk automasi dan scripting:
+- Scraping batch dengan argumen fleksibel
+- Session management otomatis
+- Support konfigurasi file custom
+- Error handling yang robust
+
+---
+
+## 🚀 Quick Start
+
+### **Web Interface (Recommended)**
 ```bash
 # Install dependencies
-pip install requests>=2.32.3 beautifulsoup4>=4.12.3 python-dotenv>=1.0.0 charset-normalizer>=3.0.0
+pip install flask requests beautifulsoup4 python-dotenv charset-normalizer
+
+# Run web interface
+python sinta-web.py
+```
+**🔗 Akses: http://localhost:5000**
+
+### **CLI Version**
+```bash
+# Install dependencies
+pip install requests beautifulsoup4 python-dotenv charset-normalizer
+
+# Run CLI directly
+python sinta-cli.py --help
 ```
 
-### 2. **Konfigurasi Login**
+---
+
+## ⚙️ Setup & Konfigurasi
+
+### 1. **Kredensial Login**
 Buat file `.env` di folder utama:
 ```env
 SINTA_USERNAME=email_sinta_anda
 SINTA_PASSWORD=password_sinta_anda
 ```
 
-### 3. **Daftar Dosen**
+### 2. **Daftar Dosen**
 Edit file `dosen.txt` - satu ID SINTA per baris:
 ```
 6726725
@@ -27,189 +63,95 @@ Edit file `dosen.txt` - satu ID SINTA per baris:
 ```
 > ID SINTA dari URL profil: `https://sinta.kemdikbud.go.id/authors/profile/6726725`
 
-### 4. **Jalankan Scraping**
+---
+
+## 📖 Penggunaan
+
+### **🌐 Web Interface**
+1. Jalankan web interface: `python sinta-web.py`
+2. Buka browser ke http://localhost:5000
+3. Atur ID dosen via interface web
+4. Pilih kategori data yang diinginkan
+5. Klik tombol scraping dan monitor progress
+6. Download hasil via dropdown download
+7. Gunakan CSV viewer untuk melihat data
+
+### **⌨️ CLI Interface**
 ```bash
 # Scrape semua kategori
 python sinta-cli.py
 
 # Scrape kategori tertentu
+python sinta-cli.py --profil            # Profil dosen
 python sinta-cli.py --buku              # Data buku
 python sinta-cli.py --haki              # Data HAKI
-python sinta-cli.py --publikasi         # Semua publikasi
+python sinta-cli.py --penelitian        # Data penelitian
+python sinta-cli.py --ppm               # Pengabdian masyarakat
 python sinta-cli.py --publikasi-scopus  # Publikasi Scopus
 python sinta-cli.py --publikasi-gs      # Publikasi Google Scholar
 python sinta-cli.py --publikasi-wos     # Publikasi Web of Science
-python sinta-cli.py --penelitian        # Data penelitian
-python sinta-cli.py --ppm               # Pengabdian masyarakat
-python sinta-cli.py --profil            # Profil dosen
 
 # Opsi tambahan
 python sinta-cli.py --force-login       # Paksa login ulang
 python sinta-cli.py --config custom.txt # File dosen custom
 ```
 
-## 📁 Output
+---
+
+## 📁 Output & Struktur File
 
 Hasil scraping tersimpan di folder `output-DDMMYYYY/` dalam format CSV:
 
 ```
-output-18072025/
+output-19072025/
+├── profil.csv               # Profil dosen lengkap (18 kolom)
 ├── buku.csv                 # Data buku (9 kolom)
 ├── haki.csv                 # Data HAKI (7 kolom)
-├── publikasi_scopus.csv     # Publikasi Scopus (9 kolom)
-├── publikasi_gs.csv         # Publikasi Google Scholar (8 kolom)
-├── publikasi_wos.csv        # Publikasi Web of Science (15 kolom)
 ├── penelitian.csv           # Data penelitian (10 kolom)
 ├── ppm.csv                  # Pengabdian masyarakat (10 kolom)
-└── profil.csv               # Profil dosen lengkap (18 kolom)
+├── publikasi_scopus.csv     # Publikasi Scopus (9 kolom)
+├── publikasi_gs.csv         # Publikasi Google Scholar (8 kolom)
+└── publikasi_wos.csv        # Publikasi Web of Science (15 kolom)
 ```
 
-**Catatan Format**:
-- Semua file CSV menggunakan encoding UTF-8
-- Anggota penelitian/PPM dipisah dengan tanda titik koma (;)
-- Data yang tidak tersedia ditandai dengan "N/A"
-- Kolom ID Sinta dan Nama Sinta ada di setiap file untuk referensi
-- Judul dengan tanda kutip akan di-escape dengan benar dalam CSV
-- Data numerik (sitasi, dana, skor) disimpan sebagai string untuk konsistensi
+### **Struktur Project**
+```
+sinta-scraping/
+├── sinta-cli.py             # CLI application
+├── sinta-web.py             # Web interface launcher
+├── dosen.txt                # Daftar ID dosen SINTA
+├── .env                     # Kredensial login SINTA
+├── README.md                # Dokumentasi
+├── output-DDMMYYYY/         # Folder hasil scraping
+└── web/                     # Web interface files
+    ├── app.py               # Flask application
+    ├── run.py               # Web launcher
+    ├── requirements.txt     # Dependencies
+    ├── static/              # CSS & JavaScript
+    └── templates/           # HTML templates
+```
 
-## ✨ Fitur
-
-- **Login otomatis** menggunakan request
-- **Session management** - tidak perlu login berulang, session tersimpan di `.config/`
-- **Scraping selektif** - pilih kategori yang diinginkan
-- **Data lengkap** - profil mencakup nama asli, universitas, program studi, dan SINTA Score
-- **Output terstruktur** - CSV dengan header yang jelas
-- **Error handling** - pesan error yang informatif
-- **Konfigurasi fleksibel** - support file TXT dengan komentar
+---
 
 ## 🔧 Troubleshooting
 
-- **Login gagal**: Periksa kredensial di `.env`
-- **Session expired**: Gunakan `--force-login`
-- **ID tidak ditemukan**: Periksa format di `dosen.txt`
-- **Error dependency**: Install ulang packages: `pip install requests>=2.32.3 beautifulsoup4>=4.12.3 python-dotenv>=1.0.0 charset-normalizer>=3.0.0`
-- **Folder .config tidak ada**: Akan dibuat otomatis saat login pertama
+### **Common Issues**
+- **Login gagal**: Periksa kredensial di file `.env`
+- **Session expired**: Gunakan `--force-login` pada CLI
+- **ID tidak ditemukan**: Periksa format ID di `dosen.txt`
+- **Flask import error**: Install dependencies: `pip install flask`
+- **Port 5000 sudah digunakan**: Ubah port di `web/app.py`
 
-## � Format Data Output
-
-### 1. 📖 Data Buku (`buku.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Judul Buku` | Judul lengkap buku |
-| `Kategori Buku` | Kategori/jenis buku |
-| `Penulis` | Nama-nama penulis |
-| `Penerbit` | Nama penerbit |
-| `Tahun` | Tahun terbit |
-| `Kota` | Kota terbit |
-| `ISBN` | Nomor ISBN |
-| `ID Sinta` | ID SINTA dosen |
-| `Nama Sinta` | Nama dosen di SINTA |
-
-### 2. 🏛️ Data HAKI (`haki.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Judul HAKI` | Judul karya HAKI |
-| `Penemu` | Nama penemu/inventor |
-| `Jenis HAKI` | Jenis hak kekayaan intelektual |
-| `Nomor HAKI` | Nomor pendaftaran HAKI |
-| `Tahun` | Tahun pendaftaran |
-| `ID Sinta` | ID SINTA dosen |
-| `Nama Sinta` | Nama dosen di SINTA |
-
-### 3. 📚 Data Publikasi Scopus (`publikasi_scopus.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Judul Artikel` | Judul artikel publikasi |
-| `Nama Jurnal` | Nama jurnal publikasi |
-| `Quartile` | Kuartil jurnal (Q1, Q2, Q3, Q4) |
-| `Penulis` | Daftar penulis |
-| `Tahun` | Tahun publikasi |
-| `Sitasi` | Jumlah sitasi |
-| `Link` | Link ke artikel |
-| `ID Sinta` | ID SINTA dosen |
-| `Nama Sinta` | Nama dosen di SINTA |
-
-### 4. 🎓 Data Publikasi Google Scholar (`publikasi_gs.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Judul Artikel` | Judul artikel publikasi |
-| `Nama Jurnal` | Nama jurnal publikasi |
-| `Penulis` | Daftar penulis |
-| `Tahun` | Tahun publikasi |
-| `Sitasi` | Jumlah sitasi |
-| `Link` | Link ke artikel |
-| `ID Sinta` | ID SINTA dosen |
-| `Nama Sinta` | Nama dosen di SINTA |
-
-### 5. 🔬 Data Publikasi Web of Science (`publikasi_wos.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Judul Artikel` | Judul artikel publikasi |
-| `Nama Jurnal` | Nama jurnal publikasi |
-| `Quartile` | Kuartil jurnal (Q1, Q2, Q3, Q4) |
-| `Edition` | Edisi jurnal |
-| `Link Jurnal` | Link ke halaman jurnal |
-| `Penulis` | Daftar penulis |
-| `Urutan Penulis` | Urutan penulis dalam artikel |
-| `Total Penulis` | Total jumlah penulis |
-| `Tahun` | Tahun publikasi |
-| `Sitasi` | Jumlah sitasi |
-| `Terindex Scopus` | Status terindeks Scopus (Yes/No) |
-| `DOI` | Digital Object Identifier |
-| `Link` | Link ke artikel |
-| `ID Sinta` | ID SINTA dosen |
-| `Nama Sinta` | Nama dosen di SINTA |
-
-### 6. 🔬 Data Penelitian (`penelitian.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Judul Penelitian` | Judul lengkap penelitian |
-| `Ketua Penelitian` | Nama ketua penelitian |
-| `Sumber Dana` | Sumber pendanaan penelitian |
-| `Anggota Penelitian` | Daftar anggota penelitian (dipisah dengan ;) |
-| `Tahun` | Tahun pelaksanaan |
-| `Besar Dana` | Jumlah dana penelitian |
-| `Status` | Status penelitian |
-| `Sumber` | Sumber informasi |
-| `ID Sinta` | ID SINTA dosen |
-| `Nama Sinta` | Nama dosen di SINTA |
-
-### 7. 🤝 Data Pengabdian Masyarakat (`ppm.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Judul PPM` | Judul pengabdian masyarakat |
-| `Ketua PPM` | Nama ketua pengabdian |
-| `Skim PPM` | Skema pengabdian |
-| `Anggota PPM` | Daftar anggota pengabdian (dipisah dengan ;) |
-| `Tahun` | Tahun pelaksanaan |
-| `Besar Dana` | Jumlah dana pengabdian |
-| `Status` | Status pengabdian |
-| `Sumber` | Sumber informasi |
-| `ID Sinta` | ID SINTA dosen |
-| `Nama Sinta` | Nama dosen di SINTA |
-
-### 8. 👤 Data Profil Dosen (`profil.csv`)
-| Header | Deskripsi |
-|--------|-----------|
-| `Nama Sinta` | Nama dosen di SINTA |
-| `ID Sinta` | ID SINTA dosen |
-| `Universitas` | Nama universitas |
-| `Program Studi` | Program studi/jurusan |
-| `SINTA Score Overall` | Skor SINTA keseluruhan |
-| `SINTA Score 3Yr` | Skor SINTA 3 tahun terakhir |
-| `Scopus Article` | Jumlah artikel Scopus |
-| `Scopus Citation` | Jumlah sitasi Scopus |
-| `Scopus Cited Document` | Jumlah dokumen tersitasi Scopus |
-| `Scopus H-Index` | H-Index Scopus |
-| `Scopus i10-Index` | i10-Index Scopus |
-| `Scopus G-Index` | G-Index Scopus |
-| `GScholar Article` | Jumlah artikel Google Scholar |
-| `GScholar Citation` | Jumlah sitasi Google Scholar |
-| `GScholar Cited Document` | Jumlah dokumen tersitasi Google Scholar |
-| `GScholar H-Index` | H-Index Google Scholar |
-| `GScholar i10-Index` | i10-Index Google Scholar |
-| `GScholar G-Index` | G-Index Google Scholar |
+### **Data Format**
+- Semua file CSV menggunakan encoding UTF-8
+- Anggota penelitian/PPM dipisah dengan tanda titik koma (;)
+- Data yang tidak tersedia ditandai dengan "N/A"
+- ID Sinta dan Nama Sinta ada di setiap file untuk referensi
 
 ---
 
 **Happy Scraping! 🎉**
+
+**Quick Commands:**
+- **🌐 Web**: `python sinta-web.py` → http://localhost:5000
+- **⌨️ CLI**: `python sinta-cli.py --help`

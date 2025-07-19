@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINTA Scraper - Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <div class="bg-white shadow-sm mb-6">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-database text-blue-600 mr-2"></i>
+                    SINTA Scraper
+                </h1>
+                <div class="flex space-x-2">
+                    <a href="/viewer" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        <i class="fas fa-table mr-1"></i>Lihat Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid lg:grid-cols-2 gap-6">
+            
+            <!-- Konfigurasi Scraping -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-cog text-blue-600 mr-2"></i>
+                    Konfigurasi Scraping
+                </h2>
+                
+                <!-- ID Dosen -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        ID Dosen SINTA (satu ID per baris)
+                    </label>
+                    <textarea 
+                        id="lecturer-ids" 
+                        class="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="6726725&#10;1234567&#10;2345678"
+                    >{{ lecturer_ids | join('\n') }}</textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <span id="lecturer-count" class="text-sm text-gray-500">{{ lecturer_ids | length }} dosen</span>
+                        <button id="save-lecturers-btn" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                            <i class="fas fa-save mr-1"></i>Simpan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kategori -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Pilih Kategori Data</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="profil" class="category-checkbox mr-2">
+                            <span class="text-sm">Profil Dosen</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="buku" class="category-checkbox mr-2">
+                            <span class="text-sm">Buku</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="haki" class="category-checkbox mr-2">
+                            <span class="text-sm">HAKI</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="penelitian" class="category-checkbox mr-2">
+                            <span class="text-sm">Penelitian</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="ppm" class="category-checkbox mr-2">
+                            <span class="text-sm">Pengabdian (PPM)</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="publikasi-scopus" class="category-checkbox mr-2">
+                            <span class="text-sm">Publikasi Scopus</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="publikasi-gs" class="category-checkbox mr-2">
+                            <span class="text-sm">Publikasi G.Scholar</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" value="publikasi-wos" class="category-checkbox mr-2">
+                            <span class="text-sm">Publikasi WoS</span>
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">*Kosongkan untuk scrape semua kategori. Untuk publikasi, centang spesifik jenis yang diinginkan.</p>
+                </div>
+
+                <!-- Tombol Start -->
+                <button id="start-scraping-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium">
+                    <i class="fas fa-play mr-2"></i>Mulai Scraping
+                </button>
+            </div>
+
+            <!-- Status & Progress -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-info-circle text-green-600 mr-2"></i>
+                    Status
+                </h2>
+
+                <!-- Progress Section -->
+                <div id="progress-section" class="hidden mb-6">
+                    <div class="mb-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <span id="progress-message" class="text-sm font-medium text-gray-700">Ready</span>
+                            <span id="progress-percentage" class="text-sm font-medium text-blue-600">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        <span id="elapsed-time">Waktu: 00:00:00</span>
+                        <span class="float-right" id="output-directory">Output: {{ current_output_dir }}</span>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600">{{ lecturer_ids | length }}</div>
+                        <div class="text-sm text-gray-600">Dosen Terdaftar</div>
+                    </div>
+                    <div class="text-center p-3 bg-green-50 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600">{{ available_outputs | length }}</div>
+                        <div class="text-sm text-gray-600">Hasil Tersedia</div>
+                    </div>
+                </div>
+
+                <!-- Recent Results -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Hasil Terbaru</h3>
+                    {% if available_outputs %}
+                        {% for output in available_outputs[:3] %}
+                        <div class="bg-gray-50 rounded-lg mb-3 overflow-hidden">
+                            <div class="p-3 border-b border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ output.date }}</div>
+                                        <div class="text-sm text-gray-500">{{ output.files_count }} file CSV</div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <a href="/viewer?output={{ output.name }}" class="text-blue-600 hover:text-blue-800 p-2 rounded hover:bg-blue-50" title="Lihat Data">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <div class="relative">
+                                            <button onclick="toggleDropdown('{{ output.name }}')" class="text-green-600 hover:text-green-800 p-2 rounded hover:bg-green-50" title="Download Files">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <div id="dropdown-{{ output.name }}" class="hidden absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10 border">
+                                                <div class="py-1">
+                                                    {% for file in output.files %}
+                                                    <a href="/download/{{ output.name }}/{{ file }}" 
+                                                       class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        <i class="fas fa-file-csv text-green-600 mr-2"></i>
+                                                        {{ file.replace('.csv', '') }}
+                                                    </a>
+                                                    {% endfor %}
+                                                    <div class="border-t border-gray-100">
+                                                        <button onclick="downloadAllFiles('{{ output.name }}')" 
+                                                                class="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium">
+                                                            <i class="fas fa-download mr-2"></i>
+                                                            Download Semua
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if available_outputs | length > 3 %}
+                        <a href="/viewer" class="block text-center text-blue-600 hover:text-blue-800 text-sm mt-2 p-2 rounded hover:bg-blue-50">
+                            Lihat semua hasil →
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-6 text-gray-500 bg-gray-50 rounded-lg">
+                            <i class="fas fa-inbox text-3xl mb-2"></i>
+                            <div>Belum ada hasil scraping</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-sm mx-4 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Memulai Scraping</h3>
+            <p class="text-gray-600">Mohon tunggu...</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript for functionality
+        let scrapingStatus = { running: false };
+
+        // Update lecturer count
+        function updateLecturerCount() {
+            const textarea = document.getElementById('lecturer-ids');
+            const lines = textarea.value.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
+            document.getElementById('lecturer-count').textContent = `${lines.length} dosen`;
+        }
+
+        // Save lecturers
+        document.getElementById('save-lecturers-btn').addEventListener('click', async () => {
+            const textarea = document.getElementById('lecturer-ids');
+            const lecturerIds = textarea.value.split('\n').filter(line => line.trim());
+            
+            try {
+                const response = await fetch('/api/lecturers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lecturer_ids: lecturerIds })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showNotification('Daftar dosen berhasil disimpan', 'success');
+                    updateLecturerCount();
+                } else {
+                    showNotification('Gagal menyimpan daftar dosen', 'error');
+                }
+            } catch (error) {
+                showNotification('Error: ' + error.message, 'error');
+            }
+        });
+
+        // Start scraping
+        document.getElementById('start-scraping-btn').addEventListener('click', async () => {
+            if (scrapingStatus.running) return;
+
+            const checkboxes = document.querySelectorAll('.category-checkbox:checked');
+            const categories = Array.from(checkboxes).map(cb => cb.value);
+            
+            document.getElementById('loading-modal').classList.remove('hidden');
+            document.getElementById('loading-modal').classList.add('flex');
+            
+            try {
+                const response = await fetch('/api/start-scraping', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ categories })
+                });
+                
+                const result = await response.json();
+                document.getElementById('loading-modal').classList.add('hidden');
+                
+                if (result.success) {
+                    showNotification('Scraping dimulai', 'success');
+                    document.getElementById('progress-section').classList.remove('hidden');
+                    startProgressTracking();
+                } else {
+                    showNotification('Gagal memulai scraping: ' + result.error, 'error');
+                }
+            } catch (error) {
+                document.getElementById('loading-modal').classList.add('hidden');
+                showNotification('Error: ' + error.message, 'error');
+            }
+        });
+
+        // Progress tracking
+        function startProgressTracking() {
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/scraping-status');
+                    const status = await response.json();
+                    
+                    scrapingStatus = status;
+                    
+                    document.getElementById('progress-message').textContent = status.message || 'Ready';
+                    document.getElementById('progress-percentage').textContent = `${status.progress || 0}%`;
+                    document.getElementById('progress-bar').style.width = `${status.progress || 0}%`;
+                    
+                    if (status.elapsed_time) {
+                        document.getElementById('elapsed-time').textContent = `Waktu: ${status.elapsed_time}`;
+                    }
+                    
+                    if (!status.running) {
+                        clearInterval(interval);
+                        if (status.results && status.results.success) {
+                            showNotification('Scraping selesai!', 'success');
+                            setTimeout(() => window.location.reload(), 2000);
+                        } else if (status.results && !status.results.success) {
+                            showNotification('Scraping gagal: ' + (status.results.error || 'Unknown error'), 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error tracking progress:', error);
+                }
+            }, 2000);
+        }
+
+        // Toggle dropdown
+        function toggleDropdown(outputName) {
+            const dropdown = document.getElementById(`dropdown-${outputName}`);
+            const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+            
+            // Close all other dropdowns
+            allDropdowns.forEach(d => {
+                if (d.id !== `dropdown-${outputName}`) {
+                    d.classList.add('hidden');
+                }
+            });
+            
+            // Toggle current dropdown
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Download all files for an output
+        function downloadAllFiles(outputName) {
+            // Close dropdown
+            document.getElementById(`dropdown-${outputName}`).classList.add('hidden');
+            
+            // This could be implemented to create a zip file or download files sequentially
+            showNotification('Download semua file dimulai', 'success');
+            
+            // For now, redirect to viewer where user can download individually
+            window.open(`/viewer?output=${outputName}`, '_blank');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.relative')) {
+                const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+                allDropdowns.forEach(d => d.classList.add('hidden'));
+            }
+        });
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-white font-medium ${
+                type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize
+        document.getElementById('lecturer-ids').addEventListener('input', updateLecturerCount);
+        updateLecturerCount();
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
+# Daftar ID SINTA Dosen
+# Satu ID per baris
+# ID SINTA dari URL profil: https://sinta.kemdikbud.go.id/authors/profile/ID
+
 6726725
-# Contoh format:
-# - Satu ID per baris
-# - Baris komentar dimulai dengan #
-# - Baris kosong akan diabaikan
-# - Ambil ID dari URL profil SINTA: https://sinta.kemdikbud.go.id/authors/profile/6726725
+6741317
+6007349

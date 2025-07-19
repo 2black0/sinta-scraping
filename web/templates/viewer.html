@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINTA Data Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .table-container {
+            max-height: 70vh;
+            overflow: auto;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <div class="bg-white shadow-sm mb-6">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-table text-green-600 mr-2"></i>
+                    SINTA Data Viewer
+                </h1>
+                <div class="flex space-x-2">
+                    <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Control
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- File Selection -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-folder-open text-blue-600 mr-2"></i>
+                Pilih Data untuk Dilihat
+            </h2>
+            
+            <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+                {% for output in available_outputs %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-semibold text-gray-900">{{ output.date }}</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                            {{ output.files_count }} files
+                        </span>
+                    </div>
+                    
+                    <!-- Grid layout for files -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                        {% for file in output.files %}
+                        <button onclick="loadCSVData('{{ output.name }}', '{{ file }}')" 
+                                class="flex items-center p-2 bg-gray-50 hover:bg-blue-50 hover:border-blue-300 border border-gray-200 rounded text-xs transition-colors group">
+                            <i class="fas fa-file-csv text-green-600 mr-1 group-hover:text-blue-600 text-xs"></i>
+                            <span class="truncate">{{ file.replace('.csv', '').replace('_', ' ').replace('publikasi ', '').title() }}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Download all button -->
+                    <div class="pt-2 border-t border-gray-200">
+                        <button onclick="downloadAllFiles('{{ output.name }}')" 
+                                class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                            <i class="fas fa-download mr-1"></i>Download Semua
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if not available_outputs %}
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-inbox text-4xl mb-3"></i>
+                <p>Belum ada data yang tersedia</p>
+                <a href="/" class="inline-block mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                    Mulai Scraping
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Data Display -->
+        <div id="data-container" class="hidden">
+            <!-- Stats Cards -->
+            <div id="stats-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
+
+            <!-- Data Table -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h3 id="table-title" class="text-lg font-semibold text-gray-900"></h3>
+                            <p id="table-subtitle" class="text-sm text-gray-500"></p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <!-- Search -->
+                            <div class="relative">
+                                <input type="text" id="search-input" placeholder="Cari data..." 
+                                       class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            
+                            <!-- Download -->
+                            <button id="download-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-download mr-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="data-table" class="w-full">
+                        <thead id="table-head" class="sticky-header bg-gray-50 border-b border-gray-200"></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+
+                <div id="table-footer" class="p-4 border-t border-gray-200 bg-gray-50">
+                    <div class="flex items-center justify-between text-sm text-gray-600">
+                        <span id="showing-info">Menampilkan 0 dari 0 data</span>
+                        <div class="flex items-center space-x-2">
+                            <span>Rows per page:</span>
+                            <select id="rows-per-page" class="border border-gray-300 rounded px-2 py-1">
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="-1">All</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden text-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Memuat data...</p>
+        </div>
+    </div>
+
+    <script>
+        let currentData = [];
+        let filteredData = [];
+        let currentFile = '';
+        let currentOutput = '';
+
+        // Load CSV data
+        async function loadCSVData(outputDir, filename) {
+            currentOutput = outputDir;
+            currentFile = filename;
+            
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('data-container').classList.add('hidden');
+            
+            try {
+                const response = await fetch(`/api/csv-data/${outputDir}/${filename}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentData = result.data;
+                    filteredData = [...currentData];
+                    displayData(result);
+                } else {
+                    showNotification('Error: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showNotification('Error loading data: ' + error.message, 'error');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        // Display data
+        function displayData(result) {
+            const { data, columns, stats, filename } = result;
+            
+            // Update title
+            document.getElementById('table-title').textContent = filename;
+            document.getElementById('table-subtitle').textContent = `${stats.total_rows} rows, ${stats.total_columns} columns`;
+            
+            // Display stats
+            displayStats(stats);
+            
+            // Create table
+            createTable(columns, data);
+            
+            // Setup download button
+            document.getElementById('download-btn').onclick = () => {
+                window.open(`/download/${currentOutput}/${currentFile}`);
+            };
+            
+            document.getElementById('data-container').classList.remove('hidden');
+        }
+
+        // Display statistics
+        function displayStats(stats) {
+            const container = document.getElementById('stats-container');
+            container.innerHTML = '';
+            
+            const statCards = [
+                { label: 'Total Rows', value: stats.total_rows, icon: 'fas fa-list', color: 'blue' },
+                { label: 'Columns', value: stats.total_columns, icon: 'fas fa-columns', color: 'green' },
+                { label: 'File Size', value: stats.file_size, icon: 'fas fa-file', color: 'purple' }
+            ];
+            
+            // Add specific stats
+            if (stats.universities) {
+                statCards.push({ label: 'Universities', value: stats.universities, icon: 'fas fa-university', color: 'orange' });
+            }
+            if (stats.avg_sinta_score) {
+                statCards.push({ label: 'Avg SINTA Score', value: stats.avg_sinta_score, icon: 'fas fa-star', color: 'yellow' });
+            }
+            if (stats.year_range) {
+                statCards.push({ label: 'Year Range', value: stats.year_range, icon: 'fas fa-calendar', color: 'indigo' });
+            }
+            if (stats.unique_journals) {
+                statCards.push({ label: 'Unique Journals', value: stats.unique_journals, icon: 'fas fa-book', color: 'pink' });
+            }
+            
+            statCards.forEach(stat => {
+                const card = document.createElement('div');
+                card.className = `bg-white p-4 rounded-lg shadow border-l-4 border-${stat.color}-500`;
+                card.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="${stat.icon} text-${stat.color}-600 text-2xl mr-3"></i>
+                        <div>
+                            <div class="text-2xl font-bold text-gray-900">${stat.value}</div>
+                            <div class="text-sm text-gray-600">${stat.label}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Global variables to store columns order
+        let currentColumns = [];
+
+        // Create table
+        function createTable(columns, data) {
+            // Store columns order globally
+            currentColumns = [...columns];
+            
+            const thead = document.getElementById('table-head');
+            const tbody = document.getElementById('table-body');
+            
+            // Create header
+            thead.innerHTML = `
+                <tr>
+                    ${columns.map((col, index) => `
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                            onclick="sortTable(${index})">
+                            ${col}
+                            <i class="fas fa-sort ml-1 text-gray-400"></i>
+                        </th>
+                    `).join('')}
+                </tr>
+            `;
+            
+            // Render rows
+            renderTableRows();
+            
+            // Update info
+            updateShowingInfo();
+        }
+
+        // Render table rows
+        function renderTableRows() {
+            const tbody = document.getElementById('table-body');
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value);
+            const dataToShow = rowsPerPage === -1 ? filteredData : filteredData.slice(0, rowsPerPage);
+            
+            tbody.innerHTML = dataToShow.map(row => `
+                <tr class="hover:bg-gray-50 border-b border-gray-200">
+                    ${currentColumns.map(column => `
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="${row[column] || ''}">
+                            ${row[column] || '-'}
+                        </td>
+                    `).join('')}
+                </tr>
+            `).join('');
+        }
+
+        // Sort table
+        function sortTable(columnIndex) {
+            const column = currentColumns[columnIndex];
+            
+            filteredData.sort((a, b) => {
+                const aVal = a[column] || '';
+                const bVal = b[column] || '';
+                
+                // Try to parse as numbers
+                const aNum = parseFloat(aVal);
+                const bNum = parseFloat(bVal);
+                
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return aNum - bNum;
+                }
+                
+                return aVal.toString().localeCompare(bVal.toString());
+            });
+            
+            renderTableRows();
+        }
+
+        // Search function
+        function searchData() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            
+            if (!query) {
+                filteredData = [...currentData];
+            } else {
+                filteredData = currentData.filter(row => 
+                    Object.values(row).some(value => 
+                        value.toString().toLowerCase().includes(query)
+                    )
+                );
+            }
+            
+            renderTableRows();
+            updateShowingInfo();
+        }
+
+        // Update showing info
+        function updateShowingInfo() {
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value);
+            const showing = rowsPerPage === -1 ? filteredData.length : Math.min(rowsPerPage, filteredData.length);
+            
+            document.getElementById('showing-info').textContent = 
+                `Menampilkan ${showing} dari ${filteredData.length} data (total: ${currentData.length})`;
+        }
+
+        // Download all files
+        function downloadAllFiles(outputName) {
+            showNotification('Membuka halaman download...', 'success');
+            // For now, show notification. Could be enhanced to create zip downloads
+            const fileLinks = document.querySelectorAll(`[onclick*="${outputName}"]`);
+            showNotification(`${fileLinks.length} file tersedia untuk download`, 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-white font-medium ${
+                type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Event listeners
+        document.getElementById('search-input').addEventListener('input', searchData);
+        document.getElementById('rows-per-page').addEventListener('change', () => {
+            renderTableRows();
+            updateShowingInfo();
+        });
+
+        // Auto-load if output parameter exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const outputParam = urlParams.get('output');
+        if (outputParam) {
+            // Try to load the first file from this output
+            const outputDiv = document.querySelector(`[onclick*="${outputParam}"]`);
+            if (outputDiv) {
+                outputDiv.click();
+            }
+        }
+    </script>
+</body>
+</html>
